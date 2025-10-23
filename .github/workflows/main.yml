@@ -47,6 +47,7 @@ jobs:
       # 判断 ${{ matrix.program_base }} 是否存在
       - name: Check if specified file exists
         id: check_file
+        shell: bash  # 强制使用 bash 执行，避免默认shell差异
         run: |
           # 替换为你需要检查的文件路径（相对于仓库根目录）
           $programBase = "${{ matrix.program_base }}"

@@ -44,8 +44,24 @@ jobs:
           .\WinGetInstallerManifestSoftwareDownloader.exe
         working-directory: ${{ github.workspace }}  # 仓库根目录
           
+      # 判断 ${{ matrix.program_base }} 是否存在
+      - name: Check if specified file exists
+        id: check_file
+        run: |
+          # 替换为你需要检查的文件路径（相对于仓库根目录）
+          FILE_PATH="your-target-file.txt"
+          
+          if [ -f "$FILE_PATH" ]; then
+            echo "File $FILE_PATH exists"
+            echo "file_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "File $FILE_PATH does NOT exist"
+            echo "file_exists=false" >> $GITHUB_OUTPUT
+          fi
+
       # 步骤3：读取程序专属的标签和标题文件
       - name: 读取 ${{ matrix.program_base }} 的标签和标题
+        if: steps.check_file.outputs.file_exists == 'true'
         id: read_info
         run: |
           $programBase = "${{ matrix.program_base }}"
@@ -84,6 +100,7 @@ jobs:
 
       # 步骤5：计算发布时间（修复换行符，确保分行显示）
       - name: 计算发布时间（分行显示）
+        if: steps.check_file.outputs.file_exists == 'true'
         shell: bash
         run: |
           # 1. 获取两种时间（同时修复 CUT 时区为标准 UTC）
@@ -101,6 +118,7 @@ jobs:
 
       # 步骤5.1：计算文件哈希值（保持之前的无乱码配置）
       - name: 计算文件哈希值（大写+无乱码）
+        if: steps.check_file.outputs.file_exists == 'true'
         shell: bash
         env:
           LC_ALL: en_US.UTF-8
@@ -132,6 +150,7 @@ jobs:
 
       # 步骤5：发布Release（同时显示两个时间）
       - name: 发布 ${{ matrix.program_base }} 到 Release
+        if: steps.check_file.outputs.file_exists == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.read_info.outputs.tag }}

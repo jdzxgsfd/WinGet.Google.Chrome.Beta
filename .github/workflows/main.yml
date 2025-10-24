@@ -47,18 +47,18 @@ jobs:
       # 判断 ${{ matrix.program_base }} 是否存在
       - name: Check if specified file exists
         id: check_file
-        shell: bash  # 强制使用 bash 执行，避免默认shell差异
+      # 强制使用 bash 执行，避免默认shell差异
+        shell: bash  
         run: |
-          # 替换为你需要检查的文件路径（相对于仓库根目录）
-          $programBase = "${{ matrix.program_base }}"
+          programBase="${{ matrix.program_base }}"
           FILE_PATH="$programBase.tag.txt"
           
           if [ -f "$FILE_PATH" ]; then
             echo "File $FILE_PATH exists"
-            echo "file_exists=true" >> $GITHUB_OUTPUT
+            echo "file_exists=true" >> "$GITHUB_OUTPUT"
           else
             echo "File $FILE_PATH does NOT exist"
-            echo "file_exists=false" >> $GITHUB_OUTPUT
+            echo "file_exists=false" >> "$GITHUB_OUTPUT"
           fi
 
       # 步骤3：读取程序专属的标签和标题文件
